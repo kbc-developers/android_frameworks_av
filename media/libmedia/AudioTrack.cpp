@@ -220,6 +220,58 @@ AudioTrack::~AudioTrack()
     }
 }
 
+#if 1
+// Really dirty hack to give a Froyo-compatible constructor
+extern "C" AudioTrack *_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_ii(
+        AudioTrack *This,
+        int streamType,
+        uint32_t sampleRate,
+        int format,
+        int channels,
+        int frameCount,
+        uint32_t flags,
+        AudioTrack::callback_t cbf,
+        void* user,
+        int notificationFrames,
+        int sessionId);
+extern "C" AudioTrack *_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_i(
+        AudioTrack *This,
+        int streamType,
+        uint32_t sampleRate,
+        int format,
+        int channels,
+        int frameCount,
+        uint32_t flags,
+        AudioTrack::callback_t cbf,
+        void* user,
+        int notificationFrames)
+{
+    return _ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_ii(This,
+        streamType, sampleRate, format, channels,
+        frameCount, flags, cbf, user, notificationFrames, 0);
+}
+#endif
+// for one-seg
+extern "C" AudioTrack *_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_iii(
+        AudioTrack *This,
+        int streamType,
+        uint32_t sampleRate,
+        int format,
+        int channels,
+        int frameCount,
+        uint32_t flags,
+        AudioTrack::callback_t cbf,
+        void* user,
+        int notificationFrames,
+        int sessionId,
+        int unknown)
+{
+    ALOGI("_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_iii unknown=%d", unknown);
+    return _ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_ii(This,
+        streamType, sampleRate, format, channels,
+        frameCount, flags, cbf, user, notificationFrames, sessionId);
+}
+
 status_t AudioTrack::set(
         audio_stream_type_t streamType,
         uint32_t sampleRate,
