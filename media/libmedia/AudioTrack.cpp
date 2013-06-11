@@ -1335,8 +1335,8 @@ ssize_t AudioTrack::write(const void* buffer, size_t userSize)
         } else {
             toWrite = audioBuffer.size;
             memcpy(audioBuffer.i8, src, toWrite);
-            src += toWrite;
         }
+        src += toWrite;
         userSize -= toWrite;
         written += toWrite;
 
