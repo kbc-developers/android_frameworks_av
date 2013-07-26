@@ -10,8 +10,11 @@ LOCAL_SRC_FILES:=               \
     CameraService.cpp \
     CameraClient.cpp \
     Camera2Client.cpp \
+    ProCamera2Client.cpp \
+    Camera2ClientBase.cpp \
+    CameraDeviceBase.cpp \
     Camera2Device.cpp \
-    camera2/CameraMetadata.cpp \
+    Camera3Device.cpp \
     camera2/Parameters.cpp \
     camera2/FrameProcessor.cpp \
     camera2/StreamingProcessor.cpp \
@@ -20,15 +23,23 @@ LOCAL_SRC_FILES:=               \
     camera2/ZslProcessor.cpp \
     camera2/BurstCapture.cpp \
     camera2/JpegCompressor.cpp \
-    camera2/CaptureSequencer.cpp
+    camera2/CaptureSequencer.cpp \
+    camera2/ProFrameProcessor.cpp \
+    camera2/ZslProcessor3.cpp \
+    camera3/Camera3Stream.cpp \
+    camera3/Camera3IOStreamBase.cpp \
+    camera3/Camera3InputStream.cpp \
+    camera3/Camera3OutputStream.cpp \
+    camera3/Camera3ZslStream.cpp \
+    gui/RingBufferConsumer.cpp \
 
 LOCAL_SHARED_LIBRARIES:= \
     libui \
+    liblog \
     libutils \
     libbinder \
     libcutils \
     libmedia \
-    libmedia_native \
     libcamera_client \
     libgui \
     libhardware \
@@ -41,17 +52,7 @@ LOCAL_C_INCLUDES += \
     external/jpeg
 
 
-ifeq ($(BOARD_USES_QCOM_LEGACY_CAM_PARAMS),true)
-    LOCAL_CFLAGS += -DQCOM_LEGACY_CAM_PARAMS
-endif
-
-ifeq ($(BOARD_HAVE_HTC_FFC),true)
-LOCAL_CFLAGS += -DBOARD_HAVE_HTC_FFC
-endif
-
-ifeq ($(BOARD_HTC_3D_SUPPORT),true)
-   LOCAL_CFLAGS += -DHTC_3D_SUPPORT
-endif
+LOCAL_CFLAGS += -Wall -Wextra
 
 LOCAL_MODULE:= libcameraservice
 
