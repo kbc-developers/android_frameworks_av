@@ -1,7 +1,8 @@
 /*
+** Copyright (c) 2013, The Linux Foundation. All rights reserved.
+** Not a Contribution.
 **
 ** Copyright 2010, The Android Open Source Project
-** Copyright (c) 2010 - 2012, The Linux Foundation. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -47,9 +48,7 @@ const MediaProfiles::NameToTagMap MediaProfiles::sAudioEncoderNameMap[] = {
     {"aac",    AUDIO_ENCODER_AAC},
     {"heaac",  AUDIO_ENCODER_HE_AAC},
     {"aaceld", AUDIO_ENCODER_AAC_ELD},
-#ifdef QCOM_HARDWARE
     {"lpcm",  AUDIO_ENCODER_LPCM},
-#endif
 };
 
 const MediaProfiles::NameToTagMap MediaProfiles::sFileFormatMap[] = {
@@ -77,7 +76,9 @@ const MediaProfiles::NameToTagMap MediaProfiles::sCamcorderQualityNameMap[] = {
     {"fwvga", CAMCORDER_QUALITY_FWVGA},
     {"wvga", CAMCORDER_QUALITY_WVGA},
     {"vga", CAMCORDER_QUALITY_VGA},
-    {"wqvga", CAMCORDER_QUALITY_WQVGA},
+    {"wqvga",CAMCORDER_QUALITY_WQVGA},
+    {"4kuhd",CAMCORDER_QUALITY_4kUHD},
+    {"4kdci",CAMCORDER_QUALITY_4kDCI},
 
     {"timelapselow",  CAMCORDER_QUALITY_TIME_LAPSE_LOW},
     {"timelapsehigh", CAMCORDER_QUALITY_TIME_LAPSE_HIGH},
@@ -96,26 +97,26 @@ const MediaProfiles::NameToTagMap MediaProfiles::sCamcorderQualityNameMap[] = {
 /*static*/ void
 MediaProfiles::logVideoCodec(const MediaProfiles::VideoCodec& codec)
 {
-ALOGV("video codec:");
-ALOGV("codec = %d", codec.mCodec);
-ALOGV("bit rate: %d", codec.mBitRate);
-ALOGV("frame width: %d", codec.mFrameWidth);
-ALOGV("frame height: %d", codec.mFrameHeight);
-ALOGV("frame rate: %d", codec.mFrameRate);
+    ALOGV("video codec:");
+    ALOGV("codec = %d", codec.mCodec);
+    ALOGV("bit rate: %d", codec.mBitRate);
+    ALOGV("frame width: %d", codec.mFrameWidth);
+    ALOGV("frame height: %d", codec.mFrameHeight);
+    ALOGV("frame rate: %d", codec.mFrameRate);
 }
 
 /*static*/ void
 MediaProfiles::logAudioCodec(const MediaProfiles::AudioCodec& codec)
 {
-ALOGV("audio codec:");
-ALOGV("codec = %d", codec.mCodec);
-ALOGV("bit rate: %d", codec.mBitRate);
-ALOGV("sample rate: %d", codec.mSampleRate);
-ALOGV("number of channels: %d", codec.mChannels);
+    ALOGV("audio codec:");
+    ALOGV("codec = %d", codec.mCodec);
+    ALOGV("bit rate: %d", codec.mBitRate);
+    ALOGV("sample rate: %d", codec.mSampleRate);
+    ALOGV("number of channels: %d", codec.mChannels);
 }
 
 /*static*/ void
-    MediaProfiles::logVideoEncoderCap(const MediaProfiles::VideoEncoderCap& cap)
+MediaProfiles::logVideoEncoderCap(const MediaProfiles::VideoEncoderCap& cap)
 {
     ALOGV("video encoder cap:");
     ALOGV("codec = %d", cap.mCodec);
@@ -812,10 +813,8 @@ MediaProfiles::createDefaultCamcorderProfiles(MediaProfiles *profiles)
 MediaProfiles::createDefaultAudioEncoders(MediaProfiles *profiles)
 {
     profiles->mAudioEncoders.add(createDefaultAmrNBEncoderCap());
-#ifdef QCOM_HARDWARE
     profiles->mAudioEncoders.add(createDefaultAacEncoderCap());
     profiles->mAudioEncoders.add(createDefaultLpcmEncoderCap());
-#endif
 }
 
 /*static*/ void
@@ -850,7 +849,6 @@ MediaProfiles::createDefaultAmrNBEncoderCap()
         AUDIO_ENCODER_AMR_NB, 5525, 12200, 8000, 8000, 1, 1);
 }
 
-#ifdef QCOM_HARDWARE
 /*static*/ MediaProfiles::AudioEncoderCap*
 MediaProfiles::createDefaultAacEncoderCap()
 {
@@ -864,7 +862,6 @@ MediaProfiles::createDefaultLpcmEncoderCap()
     return new MediaProfiles::AudioEncoderCap(
         AUDIO_ENCODER_LPCM, 768000, 4608000, 48000, 48000, 1, 6);
 }
-#endif
 
 /*static*/ void
 MediaProfiles::createDefaultImageEncodingQualityLevels(MediaProfiles *profiles)

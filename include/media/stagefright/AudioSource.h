@@ -119,7 +119,6 @@ private:
     int64_t bufferDurationUs( ssize_t n );
 #endif
 };
-
 }  // namespace android
 
 #endif  // AUDIO_SOURCE_H_

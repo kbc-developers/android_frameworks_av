@@ -40,9 +40,7 @@
 
 #include "include/ESDS.h"
 
-#ifdef QCOM_HARDWARE
-#include "include/QCUtilityClass.h"
-#endif
+#include "include/QCUtils.h"
 
 namespace android {
 
@@ -445,7 +443,8 @@ status_t MPEG4Writer::addSource(const sp<MediaSource> &source) {
 
     // A track of type other than video or audio is not supported.
     const char *mime;
-    source->getFormat()->findCString(kKeyMIMEType, &mime);
+    sp<MetaData> meta = source->getFormat();
+    CHECK(meta->findCString(kKeyMIMEType, &mime));
     bool isAudio = !strncasecmp(mime, "audio/", 6);
     bool isVideo = !strncasecmp(mime, "video/", 6);
     if (!isAudio && !isVideo) {
@@ -513,10 +512,10 @@ int64_t MPEG4Writer::estimateMoovBoxSize(int32_t bitRate) {
 
     // If the estimation is wrong, we will pay the price of wasting
     // some reserved space. This should not happen so often statistically.
-    static const int32_t factor = mUse32BitOffset? 1: 2;
     static const int64_t MIN_MOOV_BOX_SIZE = 3 * 1024;  // 3 KB
     static const int64_t MAX_MOOV_BOX_SIZE = (180 * 3000000 * 6LL / 8000);
     int64_t size = MIN_MOOV_BOX_SIZE;
+    int32_t factor = mUse32BitOffset? 1: 2;
 
     // Max file size limit is set
     if (mMaxFileSizeLimitBytes != 0 && mIsFileSizeLimitExplicitlyRequested) {
@@ -2267,11 +2266,9 @@ status_t MPEG4Writer::Track::threadEntry() {
         meta_data->findInt32(kKeyIsSyncFrame, &isSync);
         CHECK(meta_data->findInt64(kKeyTime, &timestampUs));
 
-#ifdef QCOM_HARDWARE
-        if(!mIsAudio) {
-            QCUtilityClass::helper_MPEG4Writer_hfr(mMeta, timestampUs);
+        if (!mIsAudio) {
+            QCUtils::HFR::reCalculateTimeStamp(mMeta, timestampUs);
         }
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////
         if (mStszTableEntries->count() == 0) {
@@ -2302,9 +2299,7 @@ status_t MPEG4Writer::Track::threadEntry() {
              */
             int64_t decodingTimeUs;
             CHECK(meta_data->findInt64(kKeyDecodingTime, &decodingTimeUs));
-#ifdef QCOM_HARDWARE
-            QCUtilityClass::helper_MPEG4Writer_hfr(mMeta, decodingTimeUs);
-#endif
+            QCUtils::HFR::reCalculateTimeStamp(mMeta, decodingTimeUs);
 
             decodingTimeUs -= previousPausedDurationUs;
             cttsOffsetTimeUs =

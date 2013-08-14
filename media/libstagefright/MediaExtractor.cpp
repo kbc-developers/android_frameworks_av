@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
- * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +17,6 @@
 //#define LOG_NDEBUG 0
 #define LOG_TAG "MediaExtractor"
 #include <utils/Log.h>
-#include <cutils/properties.h>
 
 #include "include/AMRExtractor.h"
 #include "include/MP3Extractor.h"
@@ -32,10 +30,7 @@
 #include "include/WVMExtractor.h"
 #include "include/FLACExtractor.h"
 #include "include/AACExtractor.h"
-#ifdef QCOM_HARDWARE
 #include "include/ExtendedExtractor.h"
-#include "include/QCUtilityClass.h"
-#endif
 
 #include "matroska/MatroskaExtractor.h"
 
@@ -45,6 +40,8 @@
 #include <media/stagefright/MediaExtractor.h>
 #include <media/stagefright/MetaData.h>
 #include <utils/String8.h>
+
+#include "include/QCUtils.h"
 
 namespace android {
 
@@ -137,14 +134,7 @@ sp<MediaExtractor> MediaExtractor::Create(
        }
     }
 
-#ifdef QCOM_HARDWARE
-    //ret will get deleted within if replaced
-    return QCUtilityClass::helper_MediaExtractor_CreateIfNeeded(ret,
-                                                                 source,
-                                                                   mime);
-#else
-    return ret;
-#endif
+    return QCUtils::MediaExtractor_CreateIfNeeded(ret, source, mime);
 }
 
 }  // namespace android

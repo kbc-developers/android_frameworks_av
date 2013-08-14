@@ -31,7 +31,7 @@
 #include <binder/IPCThreadState.h>
 #include <media/AudioTrack.h>
 
-#include <media/stagefright/LPAPlayer.h>
+#include <media/stagefright/LPAPlayerLegacy.h>
 #include <media/stagefright/MediaDefs.h>
 #include <media/stagefright/foundation/ADebug.h>
 #include <media/stagefright/foundation/ALooper.h>
@@ -55,7 +55,7 @@ static const char   mName[] = "LPAPlayer";
 #define PCM_FORMAT 2
 #define NUM_FDS 2
 namespace android {
-int LPAPlayer::objectsAlive = 0;
+int LPAPlayer::mObjectsAlive = 0;
 bool LPAPlayer::mLpaInProgress = false;
 
 LPAPlayer::LPAPlayer(
@@ -86,7 +86,7 @@ mAudioSink(audioSink),
 mObserver(observer),
 mTrackType(TRACK_NONE){
     ALOGV("LPAPlayer::LPAPlayer() ctor");
-    objectsAlive++;
+    mObjectsAlive++;
     mLpaInProgress = true;
     mTimeStarted = 0;
     mTimePlayed = 0;
@@ -120,7 +120,7 @@ LPAPlayer::~LPAPlayer() {
     if (mAudioFlinger != NULL) {
         mAudioFlinger->deregisterClient(AudioFlingerClient);
     }
-    objectsAlive--;
+    mObjectsAlive--;
     mLpaInProgress = false;
 
 }

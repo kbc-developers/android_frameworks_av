@@ -1,6 +1,9 @@
 /*
  * Copyright (C) 2009 The Android Open Source Project
  *
+ * Copyright (c) 2009-2013, The Linux Foundation. All rights reserved.
+ * Not a Contribution
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -120,6 +123,8 @@ enum {
 
     kKeyValidSamples      = 'valD',  // int32_t
 
+    kKeyEditOffset        = 'edof',  // bool (int64_t)
+
     kKeyIsUnreadable      = 'unre',  // bool (int32_t)
 
     // An indication that a video buffer has been rendered.
@@ -161,6 +166,7 @@ enum {
     kKeyCryptoDefaultIVSize = 'cryS',  // int32_t
 
     kKeyPssh              = 'pssh',  // raw data
+    kKeyTunnelException   = 'Ntnl', // not tunnel
 };
 
 enum {

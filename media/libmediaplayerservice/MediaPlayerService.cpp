@@ -1,8 +1,7 @@
 /*
 **
 ** Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
-** Not a Contribution, Apache license notifications and license are retained
-** for attribution purposes only.
+** Not a Contribution.
 **
 ** Copyright 2008, The Android Open Source Project
 **
@@ -1144,6 +1143,22 @@ void MediaPlayerService::Client::addNewMetadataUpdate(media::Metadata::Type meta
     }
 }
 
+status_t MediaPlayerService::Client::suspend()
+{
+    ALOGV("[%d] suspend", mConnId);
+    sp<MediaPlayerBase> p = getPlayer();
+    if (p == NULL) return NO_INIT;
+    return p->suspend();
+}
+
+status_t MediaPlayerService::Client::resume()
+{
+    ALOGV("[%d] resume", mConnId);
+    sp<MediaPlayerBase> p = getPlayer();
+    if (p == NULL) return NO_INIT;
+    return p->resume();
+}
+
 #if CALLBACK_ANTAGONIZER
 const int Antagonizer::interval = 10000; // 10 msecs
 
@@ -1420,7 +1435,6 @@ status_t MediaPlayerService::AudioOutput::open(
 {
     mCallback = cb;
     mCallbackCookie = cookie;
-
 #ifdef QCOM_HARDWARE
     if (flags & AUDIO_OUTPUT_FLAG_LPA || flags & AUDIO_OUTPUT_FLAG_TUNNEL) {
         ALOGV("AudioOutput open: with flags %x",flags);
@@ -1454,7 +1468,6 @@ status_t MediaPlayerService::AudioOutput::open(
             ALOGE("no callback supplied");
             return NO_INIT;
         }
-
         if (mRecycledTrack) {
             //usleep(500000);
             // if we're not going to reuse the track, unblock and flush it
@@ -1479,7 +1492,6 @@ status_t MediaPlayerService::AudioOutput::open(
         return NO_ERROR;
     }
 #endif
-
     // Check argument "bufferCount" against the mininum buffer count
     if (bufferCount < mMinBufferCount) {
         ALOGD("bufferCount (%d) is too small and increased to %d", bufferCount, mMinBufferCount);
@@ -1779,36 +1791,34 @@ void MediaPlayerService::AudioOutput::CallbackWrapper(
     }
 #endif
     if (event == AudioTrack::EVENT_MORE_DATA) {
-        CallbackData *data = (CallbackData*)cookie;
-        data->lock();
-        AudioOutput *me = data->getOutput();
-        AudioTrack::Buffer *buffer = (AudioTrack::Buffer *)info;
-        if (me == NULL) {
-            // no output set, likely because the track was scheduled to be reused
-            // by another player, but the format turned out to be incompatible.
-            data->unlock();
-            buffer->size = 0;
-            return;
-        }
-
-        size_t actualSize = (*me->mCallback)(
-                me, buffer->raw, buffer->size, me->mCallbackCookie);
-
-        if (actualSize == 0 && buffer->size > 0 && me->mNextOutput == NULL) {
-            // We've reached EOS but the audio track is not stopped yet,
-            // keep playing silence.
-
-            memset(buffer->raw, 0, buffer->size);
-            actualSize = buffer->size;
-        }
-
-        buffer->size = actualSize;
+    CallbackData *data = (CallbackData*)cookie;
+    data->lock();
+    AudioOutput *me = data->getOutput();
+    AudioTrack::Buffer *buffer = (AudioTrack::Buffer *)info;
+    if (me == NULL) {
+        // no output set, likely because the track was scheduled to be reused
+        // by another player, but the format turned out to be incompatible.
         data->unlock();
+        buffer->size = 0;
+        return;
+    }
+
+    size_t actualSize = (*me->mCallback)(
+            me, buffer->raw, buffer->size, me->mCallbackCookie);
+
+    if (actualSize == 0 && buffer->size > 0 && me->mNextOutput == NULL) {
+        // We've reached EOS but the audio track is not stopped yet,
+        // keep playing silence.
+
+        memset(buffer->raw, 0, buffer->size);
+        actualSize = buffer->size;
+    }
+
+    buffer->size = actualSize;
+    data->unlock();
     }
 
     return;
-
-
 }
 
 int MediaPlayerService::AudioOutput::getSessionId() const
