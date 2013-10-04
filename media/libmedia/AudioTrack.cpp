@@ -142,6 +142,62 @@ AudioTrack::AudioTrack(
             0 /*sharedBuffer*/, false /*threadCanCallJava*/, sessionId);
 }
 
+#if 1
+// Really dirty hack to give a Froyo-compatible constructor
+//extern "C" AudioTrack *_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_ii(
+extern "C" AudioTrack *_ZN7android10AudioTrackC1E19audio_stream_type_tj14audio_format_tji20audio_output_flags_tPFviPvS4_ES4_ii(
+        AudioTrack *This,
+        int streamType,
+        uint32_t sampleRate,
+        int format,
+        int channels,
+        int frameCount,
+        uint32_t flags,
+        AudioTrack::callback_t cbf,
+        void* user,
+        int notificationFrames,
+        int sessionId);
+
+extern "C" AudioTrack *_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_i(
+        AudioTrack *This,
+        int streamType,
+        uint32_t sampleRate,
+        int format,
+        int channels,
+        int frameCount,
+        uint32_t flags,
+        AudioTrack::callback_t cbf,
+        void* user,
+        int notificationFrames)
+{
+    return _ZN7android10AudioTrackC1E19audio_stream_type_tj14audio_format_tji20audio_output_flags_tPFviPvS4_ES4_ii(This,
+        streamType, sampleRate, format, channels,
+        frameCount, flags, cbf, user, notificationFrames, 0);
+}
+
+// for one-seg
+extern "C" AudioTrack *_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_iii(
+        AudioTrack *This,
+        int streamType,
+        uint32_t sampleRate,
+        int format,
+        int channels,
+        int frameCount,
+        uint32_t flags,
+        AudioTrack::callback_t cbf,
+        void* user,
+        int notificationFrames,
+        int sessionId,
+        int unknown)
+{
+    ALOGI("_ZN7android10AudioTrackC1EijiiijPFviPvS1_ES1_iii unknown=%d", unknown);
+    return _ZN7android10AudioTrackC1E19audio_stream_type_tj14audio_format_tji20audio_output_flags_tPFviPvS4_ES4_ii(This,
+        streamType, sampleRate, format, channels,
+        frameCount, flags, cbf, user, notificationFrames, sessionId);
+}
+
+#endif
+
 AudioTrack::AudioTrack(
         audio_stream_type_t streamType,
         uint32_t sampleRate,
