@@ -213,7 +213,26 @@ AudioTrack::AudioTrack(
             sharedBuffer, false /*threadCanCallJava*/, sessionId, transferType, offloadInfo,
             uid, pid, pAttributes);
 }
+#ifdef JB_ONESEG_SYMBOLS
+extern "C" AudioTrack *
+_ZN7android10AudioTrackC1E19audio_stream_type_tj14audio_format_tji20audio_output_flags_tPFviPvS4_ES4_ii(
+	AudioTrack *This,
+	audio_stream_type_t streamType,
+	unsigned int sampleRate,
+	audio_format_t format,
+	unsigned int channels,
+	int frameCount,
+	audio_output_flags_t flags, 
+	void (*cbf)(int, void*, void*),
+	void* , 
+	int notificationFrames, 
+	int sessionId)
+{
+	return This;
+}
 
+
+#endif
 AudioTrack::~AudioTrack()
 {
     if (mStatus == NO_ERROR) {
@@ -1801,7 +1820,24 @@ ssize_t AudioTrack::write(const void* buffer, size_t userSize, bool blocking)
 
     return written;
 }
-
+#ifdef JB_ONESEG_SYMBOLS
+extern "C" ssize_t
+_ZN7android10AudioTrack5writeEPKvjb(
+	AudioTrack *This,
+	const void* buffer, 
+	size_t userSize,
+	 bool blocking
+);
+extern "C" ssize_t
+_ZN7android10AudioTrack5writeEPKvj(
+	AudioTrack *This,
+	const void* buffer, 
+	size_t userSize
+)
+{
+	return _ZN7android10AudioTrack5writeEPKvjb(This,buffer,userSize,false);
+}
+#endif
 // -------------------------------------------------------------------------
 
 TimedAudioTrack::TimedAudioTrack() {
